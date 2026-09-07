@@ -194,3 +194,100 @@ h1, .brand {
         justify-content: flex-start;
     }
 }
+
+.education {
+    padding: 3rem 0 5rem;
+    border-top: 1px solid var(--line);
+}
+
+.section-title {
+    font-family: "Space Grotesk", -apple-system, sans-serif;
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    margin-bottom: 2rem;
+}
+
+.education-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.25rem;
+}
+
+.edu-card {
+    background-color: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+}
+
+.edu-card:hover {
+    border-color: var(--accent);
+}
+
+.edu-card summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    position: relative;
+}
+
+.edu-card summary::-webkit-details-marker {
+    display: none;
+}
+
+.edu-card summary::after {
+    content: "+";
+    position: absolute;
+    top: 1.15rem;
+    right: 1.25rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent-dark);
+    transition: transform 0.2s ease;
+}
+
+.edu-card details[open] summary::after {
+    transform: rotate(45deg);
+}
+
+.edu-year {
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent-dark);
+    font-weight: 700;
+}
+
+.edu-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding-right: 1.5rem; 
+}
+
+.edu-tag {
+    display: inline-block;
+    width: fit-content;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    background-color: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 0.1rem 0.5rem;
+}
+
+.edu-detail {
+    padding: 0.85rem 1.5rem 1.25rem;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    border-top: 1px solid var(--line);
+}
+
+@media (max-width: 600px) {
+    .education-grid {
+        grid-template-columns: 1fr;
+    }
+}
