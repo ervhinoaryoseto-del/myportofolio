@@ -164,8 +164,6 @@ h1, .brand {
     display: block;
     width: 100%;
     height: auto;
-    /* aspect-ratio: 1 / 1;
-    /* object-fit: cover;   |  biar bordernya menyesuaikan, kalo mau 1:1 uncomment aja */
     border-radius: var(--radius);
     border: 3px solid var(--ink);
 }
@@ -229,9 +227,28 @@ h1, .brand {
     cursor: pointer;
     padding: 1.25rem 1.5rem;
     display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+}
+
+.edu-logo {
+    flex-shrink: 0;
+    width: 44px;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    background-color: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 0.3rem;
+}
+
+.edu-summary-text {
+    display: flex;
     flex-direction: column;
     gap: 0.35rem;
-    position: relative;
+    min-width: 0;
 }
 
 .edu-card summary::-webkit-details-marker {
@@ -289,5 +306,9 @@ h1, .brand {
 @media (max-width: 600px) {
     .education-grid {
         grid-template-columns: 1fr;
+    }
+
+    .edu-logo {
+        width: 36px;
     }
 }
