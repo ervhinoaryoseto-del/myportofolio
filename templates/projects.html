@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - {{ name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <a href="{% url 'main:show_main' %}" class="brand">{{ name }}</a>
+            <nav>
+                <a href="{% url 'main:show_main' %}">Profile</a>
+                <a href="{% url 'main:show_experience' %}">Experience</a>
+                <a href="{% url 'main:projects' %}">Projects</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+    <section class="projects-section" id="projects">
+        <div class="container">
+            <p class="section-kicker">Apa yang sudah saya bangun</p>
+            <div class="projects-heading">
+                <h1>Projects</h1>
+                {% if project_list %}
+                    <span class="projects-count">{{ project_list|length }} project{{ project_list|length|pluralize }}</span>
+                {% endif %}
+            </div>
+
+            <div class="projects-grid">
+                {% for project in project_list %}
+                    <article class="project-card{% if project.is_featured %} project-card--featured{% endif %}">
+                        {% if project.is_featured %}
+                            <span class="project-featured-badge">Featured</span>
+                        {% endif %}
+                        <div class="project-meta">
+                            <span class="project-category">{{ project.get_category_display }}</span>
+                            <span class="project-year">{{ project.year }}</span>
+                        </div>
+                        <h2>{{ project.title }}</h2>
+                        <p class="project-description">{{ project.description }}</p>
+
+                        {% if project.technology_list %}
+                            <ul class="project-tags">
+                                {% for tech in project.technology_list %}
+                                    <li class="project-tag">{{ tech }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+
+                        {% if project.project_url %}
+                            <a href="{{ project.project_url }}" class="project-link" target="_blank" rel="noopener noreferrer">
+                                Lihat project &rarr;
+                            </a>
+                        {% endif %}
+                    </article>
+                {% empty %}
+                    <p class="empty-state">
+                        Belum ada project yang ditambahkan.
+                    </p>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
+        </div>
+    </footer>
+</body>
+</html>

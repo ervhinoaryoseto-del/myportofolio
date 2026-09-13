@@ -366,3 +366,139 @@ h1, .brand {
     font-size: 0.85rem;
     font-weight: 600;
 }
+
+/* Tugas 2 */
+.projects-section {
+    padding: 4rem 0 5rem;
+    border-top: 1px solid var(--line);
+}
+
+.projects-section h1 {
+    font-size: 2rem;
+}
+
+.projects-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 0.4rem 0 1.5rem;
+    flex-wrap: wrap;
+}
+
+.projects-heading h1 {
+    margin: 0;
+}
+
+.projects-count {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+}
+
+.project-card {
+    position: relative;
+    padding: 1.25rem;
+    background-color: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.project-card:hover {
+    border-color: var(--accent);
+}
+
+.project-card--featured {
+    border-color: var(--accent-dark);
+    box-shadow: 0 0 0 1px var(--accent-dark);
+}
+
+.project-featured-badge {
+    position: absolute;
+    top: -0.6rem;
+    right: 1.25rem;
+    background-color: var(--accent-dark);
+    color: var(--paper);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius);
+}
+
+.project-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.project-category {
+    color: var(--accent-dark);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.project-year {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.project-card h2 {
+    margin: 0.5rem 0;
+    font-size: 1.25rem;
+}
+
+.project-description {
+    color: var(--text-muted);
+    flex-grow: 1;
+}
+
+.project-tags {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 1rem;
+}
+
+.project-tag {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    background-color: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 0.15rem 0.55rem;
+}
+
+.project-link {
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent-dark);
+    text-decoration: none;
+    align-self: flex-start;
+}
+
+.project-link:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+    .projects-grid {
+        grid-template-columns: 1fr;
+    }
+}
