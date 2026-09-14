@@ -4,7 +4,7 @@ NPM : 2506551125
 
 Kelas : PBP F
 
-### Tugas 1
+### Tugas Individu 1 Pertanyaan Reflektif
 1. Iya, saya menggunakan elemen semantik HTML5 seperti `<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, dan `<footer>` dalam merancang struktur tugas website portofolio. Seperti, pada bagian Profile dan Education saya buat menggunakan `<section>`, sedangkan setiap summary pendidikan menggunakan `<article>`. Penggunaan elemen semantik membantu saya mengelompokkan konten berdasarkan fungsi dan membuat struktur HTML lebih terorganisir serta mudah dipahami. Selain itu, penggunaan elemen seperti `<header>` dan `<footer>` membuat struktur halaman menjadi lebih jelas tanpa perlu ketergantungan pada `<div>` untuk seluruh bagian website. Hal ini juga memudahkan saya ketika mengatur CSS karena setiap bagian halaman memiliki struktur yang jelas.
 
 2. Tantangan utama ketika membuat website responsive adalah memastikan susunan konten tetap enak dibaca dan tidak terlalu berdempetan ketika ukuran layar mengecil. Pada tampilan desktop, saya menggunakan CSS Grid untuk menempatkan identitas, foto, dan informasi profil dalam beberapa bagian, sedangkan pada mobile saya mengubah susunannya menjadi satu kolom menggunakan @media. Saya mengatur elemen berdasarkan prioritas informasi dan kebutuhan space. Informasi utama seperti nama dan identitas paling diprioritaskan, kemudian foto dan informasi tambahan ditempatkan setelahnya. Pada bagian Education, saya menggunakan auto-fit dan minmax() agar jumlah kolom dapat menyesuaikan ukuran layar. Saya juga mengubah ukuran logo pendidikan pada mobile agar kartu tetap proporsional dan tidak terlalu memenuhi layar.
@@ -17,7 +17,7 @@ Saya menjelaskan ide saya untuk mengerjakan tugas 1 dan beberapa bagian kode yan
 
 Saya mengerjakan kode index.html dengan sendiri, dimana pada section education dengan melihat referensi syntax dari w3schools, menentukan konsep dan section yang ingin ditambahkan, memilih serta memasukkan data, menyesuaikan tampilan sesuai kebutuhan desain, dan melakukan pengecekan hasilnya secara langsung di browser.
 
-### Tugas 2
+### Tugas Individu 2 Pertanyaan Reflektif
 1. Jelaskan alur yang terjadi ketika pengguna membuka halaman portofolio baru, mulai dari permintaan yang diterima proyek hingga data ditampilkan pada browser. Dalam jawabanmu, jelaskan peran urls.py proyek, urls.py aplikasi, view, model, dan template.9
 = Saat user membuka halaman portofolio baru, request pertama kali diterima oleh Django dan masuk ke urls.py yang ada di project. Dari sana, Django akan mencari URL yang sesuai dan meneruskannya ke urls.py pada aplikasi main. Setelah URL nya cocok, request diteruskan ke view yang sesuai (konsep MVT).
 
