@@ -43,6 +43,7 @@ class Project(models.Model):
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='personal')
     technologies = models.CharField(max_length=255, blank=True, help_text="Daftar teknologi dipisahkan koma, contoh: Django, React, Figma.",)
     project_url = models.URLField(blank=True, null=True)
+    image_url = models.URLField(blank=True, null=True)
     is_featured = models.BooleanField(default=False)
 
     class Meta:
