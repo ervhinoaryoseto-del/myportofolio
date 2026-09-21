@@ -1,4 +1,4 @@
-from main.forms import ProjectForm
+from main.forms import ProjectForm, ExperienceForm
 from main.models import Experience, Project
 
 from django.contrib import messages
@@ -26,6 +26,59 @@ def show_experience(request):
     }
     return render(request, "experience.html", context)
 
+def create_experience(request):
+    form = ExperienceForm(request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Pengalaman baru berhasil ditambahkan!")
+        return redirect("main:show_experience")
+
+    context = {
+        "name": "Ervhino Aryo Seto",
+        "form": form,
+    }
+    return render(request, "experience_form.html", context)
+
+
+def get_experiences_json(request):
+    title_query = request.GET.get("title", "").strip()
+    experiences = Experience.objects.all()
+
+    if title_query:
+        experiences = experiences.filter(title__icontains=title_query)
+
+    experiences_json = serializers.serialize("json", experiences)
+    return HttpResponse(experiences_json, content_type="application/json")
+
+
+def delete_experience(request, experience_id):
+    experience = get_object_or_404(Experience, pk=experience_id)
+
+    if request.method == "POST":
+        experience.delete()
+        messages.success(request, "Experience berhasil dihapus!")
+        return redirect("main:show_experience")
+
+    return redirect("main:show_experience")
+
+def update_experience(request, experience_id):
+    experience = get_object_or_404(Experience, pk=experience_id)
+
+    form = ExperienceForm(request.POST or None, instance=experience)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Experience berhasil diperbarui!")
+        return redirect("main:show_experience")
+
+    context = {
+        "name": "Ervhino Aryo Seto",
+        "form": form,
+        "experience": experience,
+    }
+
+    return render(request, "experience_update_form.html", context)
 
 def show_projects(request):
     context = {
