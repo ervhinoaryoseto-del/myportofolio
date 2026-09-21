@@ -35,3 +35,21 @@ Contohnya, jika saya memiliki model Project lalu ingin menambahkan field baru se
 
 ## AI Disclosure
 Saat pengerjaan tugas 2 ini,saya menggunakan bantuan Gen-AI untuk membantu saya memahami proses pembuatan superuser pada Django dan langkah-langkah yang perlu dilakukan melalui terminal. Selain itu, saya juga menggunakan Gen-AI untuk membantu memahami beberapa konsep dan mengecek implementasi yang saya kerjakan. Seluruh proses dan kode tetap saya sesuaikan dan kerjakan sendiri berdasarkan kebutuhan tugas.
+
+
+### Tugas Individu 3 Pertanyaan Reflektif
+1. Jelaskan mengapa kita menggunakan ModelForm pada Django alih-alih membuat form HTML secara manual. Selain itu, jelaskan pula mengapa kita diwajibkan menambahkan {% csrf_token %} pada form tersebut!
+= Karena ModelForm itu form-nya bisa langsung connect dengan model Django, jadi nggak perlu bikin input dan validasi dari awal secara manual. ModelForm juga membantu memastikan data yang dimasukkan sesuai dengan field dan aturan yang sudah didefinisikan pada model.
+
+Sementara itu, {% csrf_token %} digunakan untuk melindungi form dari serangan Cross-Site Request Forgery (CSRF). Token ini memastikan bahwa request POST yang dikirim berasal dari form pada aplikasi kita dan bukan dari request berbahaya yang dibuat oleh pihak lain.
+
+2. Pada Tutorial 03, kita membahas format data JSON dan XML. Mengapa JSON lebih disukai dalam pengembangan aplikasi web modern dibandingkan XML?
+= JSON lebih sering digunakan dibandingkan XML karena formatnya lebih sederhana, ringkas, dan mudah dibaca oleh manusia. JSON juga lebih mudah diproses oleh aplikasi karena strukturnya menggunakan pasangan key-value dan array yang sesuai dengan struktur data pada JavaScript. Selain itu, JSON banyak digunakan dalam komunikasi antara frontend dan backend, terutama dalam pengembangan API.
+
+3. Jelaskan alur yang terjadi saat kamu menggunakan fungsi view untuk mengembalikan data portofoliomu dalam bentuk JSON. Mengapa kita perlu melakukan proses serialization pada model Django sebelum datanya dikembalikan?
+= Saat user meminta data portofolio dalam bentuk JSON, request akan masuk ke view. View kemudian mengambil data Project dari database menggunakan Django ORM. Data tersebut masih berupa object atau QuerySet Django sehingga belum dapat langsung dikirim sebagai JSON.
+
+Oleh karena itu, dilakukan proses serialization menggunakan serializers.serialize("json", projects). Serialization mengubah object atau QuerySet Django menjadi data dalam format JSON yang dapat dikirim melalui HTTP response. Lalu, setelah proses selesai JSON dikembalikan kepada client menggunakan HttpResponse dengan content_type="application/json".
+
+## AI Disclosure
+Penggunaan Generative AI pada pengerjaan Tugas 3 ini membantu saya memahami konsep ModelForm, CSRF token, dan proses serialization pada Django. Saya menggunakan Gen-AI ChatGPT untuk menjelaskan konsep-konsep tersebut dan memberikan contoh implementasi yang sesuai dengan kebutuhan tugas. Namun, seluruh kode dan implementasi tetap saya kerjakan sendiri berdasarkan pemahaman yang saya peroleh dari tutorial 3 kemarin. Saya juga sempat berkonsultasi dengan Gen-AI terkait action untuk section update form dan create form dimana pada intuisi awal saya membuat dua template berbeda untuk update dan create, namun setelah berdiskusi dengan Gen-AI saya memutuskan untuk menggunakan satu template yang sama untuk kedua action tersebut. Hal ini membantu saya memahami konsep DRY (Don't Repeat Yourself) dalam pengembangan aplikasi web.
