@@ -340,7 +340,7 @@ h1, .brand {
 
 .experience-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: 1fr;
     gap: 1rem;
 }
 
@@ -372,6 +372,90 @@ h1, .brand {
     margin-top: 1rem;
     font-size: 0.85rem;
     font-weight: 600;
+}
+
+.experience-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin: 0.4rem 0 1.5rem;
+    flex-wrap: wrap;
+}
+
+.experience-header h1 {
+    margin: 0;
+}
+
+.experience-add-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.experience-add-button span {
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+.experience-card {
+    padding: 1.25rem;
+    background-color: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+}
+
+.experience-card:hover {
+    border-color: var(--accent);
+}
+
+.experience-category {
+    color: var(--accent-dark);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.experience-card h2 {
+    margin: 0.5rem 0;
+    font-size: 1.25rem;
+}
+
+.experience-description {
+    color: var(--text-muted);
+}
+
+.experience-status {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.experience-card-actions {
+    margin-top: auto;
+}
+
+.experience-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.experience-actions form {
+    margin: 0;
+}
+
+.experience-actions .button {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.experience-actions .button-danger {
+    background: #b42318;
 }
 
 /* Tugas 2 */
