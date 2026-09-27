@@ -119,7 +119,7 @@ def get_projects_json(request):
     if title_query:
         projects = projects.filter(title__icontains=title_query)
 
-    projects_json = serializers.serialize("json", projects)
+    projects_json = serializers.serialize("json", projects, use_natural_foreign_keys=True)
     return HttpResponse(projects_json, content_type="application/json")
 
 @login_required(login_url="/login/") 
@@ -168,6 +168,7 @@ def logout_user(request):
     logout(request)
     response = redirect("main:show_main")
     response.delete_cookie('last_login')
+    response.delete_cookie('sessionid')
     return response
 
 @login_required(login_url="/login/")
