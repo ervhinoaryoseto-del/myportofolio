@@ -1,4 +1,5 @@
 import uuid
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -46,6 +47,10 @@ class Project(models.Model):
     image_url = models.URLField(blank=True, null=True)
     is_featured = models.BooleanField(default=False)
 
+    starred_by = models.ManyToManyField(
+        User, related_name="starred_projects", blank=True
+    )
+    
     class Meta:
         ordering = ['-is_featured', '-year', 'title']
 
