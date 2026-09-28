@@ -47,9 +47,7 @@ class Project(models.Model):
     image_url = models.URLField(blank=True, null=True)
     is_featured = models.BooleanField(default=False)
 
-    starred_by = models.ManyToManyField(
-        User, related_name="starred_projects", blank=True
-    )
+    starred_by = models.ManyToManyField(User, related_name="starred_projects", blank=True)
     
     class Meta:
         ordering = ['-is_featured', '-year', 'title']
@@ -63,3 +61,7 @@ class Project(models.Model):
         if not self.technologies:
             return []
         return [tech.strip() for tech in self.technologies.split(',') if tech.strip()]
+
+    @property
+    def star_count(self):
+        return self.starred_by.count()
