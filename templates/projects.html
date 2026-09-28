@@ -31,18 +31,24 @@
                 <div class="project-grid">
                     {% for project in project_list %}
                         <article class="project-card">
-                            {% if project.project_image_url %}
-                                <img src="{{ project.project_image_url }}"
+                            {% if project.image_url %}
+                                <img src="{{ project.image_url }}"
                                      alt="Gambar {{ project.title }}"
                                      class="project-image">
                             {% endif %}
                             <h2>{{ project.title }}</h2>
-                            <span class="project-category">{{ project.tech_stack }}</span>
+                            <span class="project-category">{{ project.get_category_display }} · {{ project.year }}</span>
+                            {% if project.technology_list %}
+                                <p class="project-tech">{{ project.technology_list|join:", " }}</p>
+                            {% endif %}
                             <p class="project-description">{{ project.description }}</p>
                             <div class="project-card-actions">
                                 <div class="project-actions">
                                     {% if project.project_url %}
                                         <a href="{{ project.project_url }}" class="button">Lihat Project</a>
+                                    {% endif %}
+                                    {% if user.is_superuser or is_editor %}
+                                        <a href="{% url 'main:update_project' project.id %}" class="button">Edit Proyek</a>
                                     {% endif %}
                                     {% include "components/project_star.html" with project=project %}
                                     {% if user.is_superuser %}
