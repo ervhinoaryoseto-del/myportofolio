@@ -53,3 +53,9 @@ Oleh karena itu, dilakukan proses serialization menggunakan serializers.serializ
 
 ## AI Disclosure
 Penggunaan Generative AI pada pengerjaan Tugas 3 ini membantu saya memahami konsep ModelForm, CSRF token, dan proses serialization pada Django. Saya menggunakan Gen-AI ChatGPT untuk menjelaskan konsep-konsep tersebut dan memberikan contoh implementasi yang sesuai dengan kebutuhan tugas. Namun, seluruh kode dan implementasi tetap saya kerjakan sendiri berdasarkan pemahaman yang saya peroleh dari tutorial 3 kemarin. Saya juga sempat berkonsultasi dengan Gen-AI terkait action untuk section update form dan create form dimana pada intuisi awal saya membuat dua template berbeda untuk update dan create, namun setelah berdiskusi dengan Gen-AI saya memutuskan untuk menggunakan satu template yang sama untuk kedua action tersebut. Hal ini membantu saya memahami konsep DRY (Don't Repeat Yourself) dalam pengembangan aplikasi web.
+
+
+### Tugas Individu 4 
+
+## AI Disclosure
+Saya menggunakan bantuan Generative AI yaitu Gemini untuk membantu saya review materi yang ada pada tutorial 4, terutama tentang Authentication, Session and Cookies Implementation. Lalu, karena rentang waktu pengerjaan antara tutorial dan tugas saya kerjakan dalam waktu relative dekat, seluruh implementasi konsep dan kode program saya kerjakan secara mandiri. Penggunaan AI pada tugas ini saya manfaatkan untuk memastikan endpoint JSON dari Tugas 3 tetap berfungsi tanpa membocorkan informasi sensitif. 
