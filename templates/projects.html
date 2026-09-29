@@ -8,6 +8,9 @@
             <div class="container">
                 <p class="section-kicker">What I've Built ...</p>
                 <div class="project-header">
+                    <button class="button button-secondary" onclick="showToast('Notifikasi Sistem', 'Project berhasil dimuat dengan baik!', 'success')">
+                        Test Toast Notifikasi
+                    </button>
                     <h1>Projects</h1>
                     {% if user.is_superuser %}    
                         <a href="{% url 'main:create_project' %}"
