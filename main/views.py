@@ -4,12 +4,13 @@ from main.models import Experience, Project
 
 from django.contrib import messages
 from django.core import serializers
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts   import get_object_or_404, redirect, render
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.decorators import login_required  
 from django.core.exceptions import PermissionDenied        
+from django.views.decorators.http import require_POST
 
 def show_main(request):
     last_login = request.COOKIES.get('last_login', 'Belum ada sesi login / Cookie tidak ditemukan')
@@ -90,24 +91,13 @@ def update_experience(request, experience_id):
 def is_editor_user(user):
     return user.is_authenticated and user.groups.filter(name__iexact='Editor').exists()
 
-
 def show_projects(request):
     title_query = request.GET.get("title", "").strip()
-    projects = Project.objects.prefetch_related("starred_by")
-
-    if title_query:
-        projects = projects.filter(title__icontains=title_query)
-
-    starred_ids = set()
-    if request.user.is_authenticated:
-        starred_ids = set(request.user.starred_projects.values_list("pk", flat=True))
 
     context = {
         "name": "Ervhino Aryo Seto",
-        "project_list": projects,
         "title_query": title_query,
-        "is_editor": is_editor_user(request.user),
-        "starred_ids": starred_ids,
+        "form": ProjectForm(),
     }
     return render(request, "projects.html", context)
 
@@ -131,21 +121,35 @@ def create_project(request):
 
 def get_projects_json(request):
     title_query = request.GET.get("title", "").strip()
-    projects = Project.objects.all()
+    projects = Project.objects.prefetch_related('starred_by').all()
 
     if title_query:
         projects = projects.filter(title__icontains=title_query)
 
-    projects_json = serializers.serialize(
-        "json",
-        projects,
-        fields=[
-            "title", "description", "year", "category",
-            "technologies", "project_url", "image_url", "is_featured",
-        ],
-    )
-    return HttpResponse(projects_json, content_type="application/json")
+    data = []
+    for project in projects:
+        starred_users = project.starred_by.all()
+        is_starred = request.user in starred_users if request.user.is_authenticated else False
+        starred_by_names = ", ".join([u.username for u in starred_users])
 
+        data.append({
+            "pk": str(project.id),
+            "fields": {
+                "title": project.title,
+                "description": project.description,
+                "year": project.year,
+                "category": project.category,
+                "technologies": project.technology_list,
+                "project_url": project.project_url,
+                "image_url": project.image_url,
+                "is_featured": project.is_featured,
+                "star_count": starred_users.count(),
+                "is_starred": is_starred,
+                "starred_by_names": starred_by_names,
+            }
+        })
+    return JsonResponse(data, safe=False)
+    
 @login_required(login_url="/login/") 
 def delete_project(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
@@ -231,3 +235,21 @@ def toggle_star(request, project_id):
             project.starred_by.add(request.user)
 
     return redirect("main:show_projects")
+
+@require_POST
+def create_project_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Hanya pemilik portofolio yang dapat menambahkan proyek."},
+            status=403,
+        )
+
+    form = ProjectForm(request.POST)
+    if form.is_valid():
+        project = form.save()
+        return JsonResponse(
+            {"message": "Proyek berhasil ditambahkan.", "pk": str(project.id)},
+            status=201,
+        )
+
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
