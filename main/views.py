@@ -30,11 +30,16 @@ def show_main(request):
 def show_experience(request):
     context = {
         "name": "Ervhino Aryo Seto",
-        "experience_list": Experience.objects.all(),
+        "experience_list": Experience.objects.prefetch_related("starred_by"),
+        "can_edit": request.user.is_superuser or is_editor_user(request.user),
     }
     return render(request, "experience.html", context)
 
+@login_required(login_url="/login/")
 def create_experience(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
     form = ExperienceForm(request.POST or None)
 
     if request.method == "POST" and form.is_valid():
@@ -56,11 +61,15 @@ def get_experiences_json(request):
     if title_query:
         experiences = experiences.filter(title__icontains=title_query)
 
-    experiences_json = serializers.serialize("json", experiences)
+    experiences_json = serializers.serialize("json", experiences, use_natural_foreign_keys=True)
     return HttpResponse(experiences_json, content_type="application/json")
 
 
+@login_required(login_url="/login/")
 def delete_experience(request, experience_id):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
     experience = get_object_or_404(Experience, pk=experience_id)
 
     if request.method == "POST":
@@ -70,7 +79,11 @@ def delete_experience(request, experience_id):
 
     return redirect("main:show_experience")
 
+@login_required(login_url="/login/")
 def update_experience(request, experience_id):
+    if not (request.user.is_superuser or is_editor_user(request.user)):
+        raise PermissionDenied
+
     experience = get_object_or_404(Experience, pk=experience_id)
 
     form = ExperienceForm(request.POST or None, instance=experience)
@@ -235,6 +248,19 @@ def toggle_star(request, project_id):
             project.starred_by.add(request.user)
 
     return redirect("main:show_projects")
+
+
+@login_required(login_url="/login/")
+def toggle_experience_star(request, experience_id):
+    experience = get_object_or_404(Experience, pk=experience_id)
+
+    if request.method == "POST":
+        if request.user in experience.starred_by.all():
+            experience.starred_by.remove(request.user)
+        else:
+            experience.starred_by.add(request.user)
+
+    return redirect("main:show_experience")
 
 @require_POST
 def create_project_ajax(request):
