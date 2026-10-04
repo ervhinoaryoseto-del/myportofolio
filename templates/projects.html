@@ -44,43 +44,7 @@
                     <p>Belum ada proyek yang ditambahkan atau ditemukan.</p>
                 </div>
 
-                <div class="project-grid" id="grid">
-                    {% for project in project_list %}
-                        <article class="project-card">
-                            {% if project.image_url %}
-                                <img src="{{ project.image_url }}"
-                                     alt="Gambar {{ project.title }}"
-                                     class="project-image">
-                            {% endif %}
-                            <h2>{{ project.title }}</h2>
-                            <span class="project-category">{{ project.get_category_display }} · {{ project.year }}</span>
-                            {% if project.technology_list %}
-                                <p class="project-tech">{{ project.technology_list|join:", " }}</p>
-                            {% endif %}
-                            <p class="project-description">{{ project.description }}</p>
-                            <div class="project-card-actions">
-                                <div class="project-actions">
-                                    {% if project.project_url %}
-                                        <a href="{{ project.project_url }}" class="button">Lihat Project</a>
-                                    {% endif %}
-                                    {% if user.is_superuser or is_editor %}
-                                        <a href="{% url 'main:update_project' project.id %}" class="button">Edit Proyek</a>
-                                    {% endif %}
-                                    {% include "components/project_star.html" with project=project %}
-                                    {% if user.is_superuser %}
-                                        {% include "components/project_delete_modal.html" with project=project %}
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </article>
-                    {% empty %}
-                        {% if title_query %}
-                            <p class="empty-state">Tidak ada proyek dengan nama tersebut.</p>
-                        {% else %}
-                            <p class="empty-state">Belum ada proyek yang ditambahkan.</p>
-                        {% endif %}
-                    {% endfor %}
-                </div>
+                <div class="project-grid" id="grid"></div>
             </div>
         </section>
     </main>
@@ -93,6 +57,7 @@
     // Konfigurasi
     const BASE_PROJECTS_ENDPOINT = "{% url 'main:get_projects_json' %}";
     const IS_SUPERUSER = "{{ user.is_superuser|yesno:'true,false' }}" === "true";
+    const CAN_EDIT = "{{ can_edit|yesno:'true,false' }}" === "true";
     let projectsAbortController;
 
     // Elemen DOM
@@ -145,6 +110,13 @@
         const starUrl = "{% url 'main:toggle_star' '00000000-0000-0000-0000-000000000000' %}"
             .replace('00000000-0000-0000-0000-000000000000', projectId);
 
+        const editUrl = "{% url 'main:update_project' '00000000-0000-0000-0000-000000000000' %}"
+            .replace('00000000-0000-0000-0000-000000000000', projectId);
+
+        const editHtml = CAN_EDIT
+            ? `<a href="${escapeHtml(editUrl)}" class="button">Edit Proyek</a>`
+            : '';
+
         const deleteHtml = IS_SUPERUSER 
             ? `<form method="post" action="${deleteUrl}" style="display:inline;">
                 {% csrf_token %}
@@ -171,6 +143,7 @@
             <div class="project-card-actions">
                 <div class="project-actions">
                     ${urlHtml}
+                    ${editHtml}
                     
                     <form method="post" action="${starUrl}" class="star-form">
                         {% csrf_token %}
