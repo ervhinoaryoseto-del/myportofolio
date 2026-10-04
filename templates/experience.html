@@ -10,11 +10,13 @@
                 <p class="section-kicker">My Journey So Far...</p>
                 <div class="experience-header">
                     <h1>Experience</h1>
-                    <a href="{% url 'main:create_experience' %}"
-                       class="button experience-add-button">
-                        <span aria-hidden="true">+</span>
-                        Tambah Experience
-                    </a>
+                    {% if user.is_superuser %}
+                        <a href="{% url 'main:create_experience' %}"
+                           class="button experience-add-button">
+                            <span aria-hidden="true">+</span>
+                            Tambah Experience
+                        </a>
+                    {% endif %}
                 </div>
                 <div class="experience-grid">
                     {% for experience in experience_list %}
@@ -49,20 +51,23 @@
                                         </a>
                                     {% endif %}
 
-                                    <a href="{% url 'main:update_experience' experience.id %}"
-                                       class="button">
-                                        Edit Experience
-                                    </a>
-
-                                    <form method="POST"
-                                          action="{% url 'main:delete_experience' experience.id %}">
-                                        {% csrf_token %}
-
-                                        <button type="submit"
-                                            class="button button-danger">
-                                            Hapus Experience
-                                        </button>
-                                    </form>
+                                    {% include "components/experience_star.html" with experience=experience %}
+                                    {% if can_edit %}
+                                        <a href="{% url 'main:update_experience' experience.id %}"
+                                           class="button">
+                                            Edit Experience
+                                        </a>
+                                    {% endif %}
+                                    {% if user.is_superuser %}
+                                        <form method="POST"
+                                              action="{% url 'main:delete_experience' experience.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit"
+                                                class="button button-danger">
+                                                Hapus Experience
+                                            </button>
+                                        </form>
+                                    {% endif %}
                                 </div>
                             </div>
                         </article>
