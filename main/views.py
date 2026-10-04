@@ -30,13 +30,15 @@ def show_main(request):
 def show_experience(request):
     context = {
         "name": "Ervhino Aryo Seto",
-        "experience_list": Experience.objects.prefetch_related("starred_by"),
+        "title_query": request.GET.get("title", "").strip(),
         "can_edit": request.user.is_superuser or is_editor_user(request.user),
+        "form": ExperienceForm() if request.user.is_superuser else None,
     }
     return render(request, "experience.html", context)
 
 @login_required(login_url="/login/")
 def create_experience(request):
+    # Hanya pemilik portofolio (superuser) yang boleh menambah
     if not request.user.is_superuser:
         raise PermissionDenied
 
@@ -56,17 +58,39 @@ def create_experience(request):
 
 def get_experiences_json(request):
     title_query = request.GET.get("title", "").strip()
-    experiences = Experience.objects.all()
+    experiences = Experience.objects.prefetch_related("starred_by").order_by("-started_at")
 
     if title_query:
         experiences = experiences.filter(title__icontains=title_query)
 
-    experiences_json = serializers.serialize("json", experiences, use_natural_foreign_keys=True)
-    return HttpResponse(experiences_json, content_type="application/json")
+    # JSON dirakit manual agar bisa menyisipkan info star milik user yang sedang login
+    data = []
+    for experience in experiences:
+        starred_users = experience.starred_by.all()
+        is_starred = request.user in starred_users if request.user.is_authenticated else False
+        starred_by_names = ", ".join(u.username for u in starred_users)
+
+        data.append({
+            "pk": str(experience.id),
+            "fields": {
+                "title": experience.title,
+                "description": experience.description,
+                "category": experience.category,
+                "category_display": experience.get_category_display(),
+                "thumbnail": experience.thumbnail,
+                "is_ongoing": experience.is_ongoing,
+                "star_count": len(starred_users),
+                "is_starred": is_starred,
+                "starred_by_names": starred_by_names,
+            },
+        })
+
+    return JsonResponse(data, safe=False)
 
 
 @login_required(login_url="/login/")
 def delete_experience(request, experience_id):
+    # Hanya pemilik portofolio (superuser) yang boleh menghapus
     if not request.user.is_superuser:
         raise PermissionDenied
 
@@ -81,6 +105,7 @@ def delete_experience(request, experience_id):
 
 @login_required(login_url="/login/")
 def update_experience(request, experience_id):
+    #Superuser dan Editor boleh mengedit
     if not (request.user.is_superuser or is_editor_user(request.user)):
         raise PermissionDenied
 
@@ -111,6 +136,7 @@ def show_projects(request):
         "name": "Ervhino Aryo Seto",
         "title_query": title_query,
         "form": ProjectForm(),
+        "can_edit": request.user.is_superuser or is_editor_user(request.user),
     }
     return render(request, "projects.html", context)
 
@@ -240,8 +266,6 @@ def toggle_star(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
 
     if request.method == "POST":
-        # Kalau akun ini sudah pernah memberi star, batalkan star-nya.
-        # Kalau belum, tambahkan star.
         if request.user in project.starred_by.all():
             project.starred_by.remove(request.user)
         else:
@@ -277,5 +301,21 @@ def create_project_ajax(request):
             {"message": "Proyek berhasil ditambahkan.", "pk": str(project.id)},
             status=201,
         )
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
 
+@require_POST
+def create_experience_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Hanya pemilik portofolio yang dapat menambahkan experience."},
+            status=403,
+        )
+
+    form = ExperienceForm(request.POST)
+    if form.is_valid():
+        experience = form.save()
+        return JsonResponse(
+            {"message": "Experience berhasil ditambahkan.", "pk": str(experience.id)},
+            status=201,
+        )
     return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
