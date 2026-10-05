@@ -37,6 +37,7 @@
                 <!-- Error State -->
                 <div id="error" class="empty-state hide">
                     <p>Gagal memuat data projects. Silakan coba lagi.</p>
+                    <button type="button" id="retry-button" class="button">Coba lagi</button>
                 </div>
 
                 <!-- Empty State -->
@@ -78,15 +79,7 @@
         gridContainer.classList.toggle('hide', !showGrid);
     }
 
-    // Mengubah karakter khusus HTML menjadi entity agar ditampilkan sebagai teks
-    function escapeHtml(value) {
-        return String(value ?? '')
-            .replaceAll('&', '&amp;')
-            .replaceAll('<', '&lt;')
-            .replaceAll('>', '&gt;')
-            .replaceAll('"', '&quot;')
-            .replaceAll("'", '&#39;');
-    }
+    // escapeHtml() dan getCookie() dimuat dari static/js/utils.js (lewat base.html)
 
     // Membuat elemen card project
     function buildProjectCardElement(item) {
@@ -94,7 +87,7 @@
         const projectId = item.pk;
 
         const articleElement = document.createElement('article');
-        articleElement.className = 'project-card';
+        articleElement.className = project.is_featured ? 'project-card project-card--featured' : 'project-card';
 
         const imageHtml = project.image_url
             ? `<img src="${escapeHtml(project.image_url)}" alt="Gambar ${escapeHtml(project.title)}" class="project-image">`
@@ -133,8 +126,13 @@
         const techText = (project.technologies || []).map(escapeHtml).join(', ');
         const techHtml = techText ? `<p class="project-tech">${techText}</p>` : '';
 
+        const featuredBadgeHtml = project.is_featured
+            ? '<span class="project-featured-badge">Featured</span>'
+            : '';
+
         // Komponen card
         const completeCardHtml = `
+            ${featuredBadgeHtml}
             ${imageHtml}
             <h2>${escapeHtml(project.title)}</h2>
             <span class="project-category">${escapeHtml(project.category)} · ${escapeHtml(project.year)}</span>
@@ -169,21 +167,6 @@
     const CREATE_PROJECT_ENDPOINT = "{% url 'main:create_project_ajax' %}";
     const projectForm = document.getElementById('project-form');
 
-    // Membaca nilai cookie, digunakan untuk mengambil token CSRF
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
 
     // Mengirim data form ke server
     async function addProject(event) {
@@ -274,6 +257,11 @@
         event.preventDefault();
         clearTimeout(searchDebounceTimer);
         searchProjects();
+    });
+
+    //Tombol "Coba lagi" pada state error
+    document.getElementById('retry-button').addEventListener('click', function () {
+        fetchProjects(searchInput.value.trim());
     });
 
     function closeProjectModal() {

@@ -1,4 +1,4 @@
- Django
+# Django
 *.log
 *.pot
 *.pyc
@@ -120,3 +120,6 @@ sftp-config.json
 
 # macOS
 .DS_Store
+
+# Output collectstatic
+staticfiles/

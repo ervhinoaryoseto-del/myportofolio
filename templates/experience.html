@@ -39,6 +39,7 @@
                 <!-- Error State -->
                 <div id="error" class="empty-state hide">
                     <p>Gagal memuat data experience. Silakan coba lagi.</p>
+                    <button type="button" id="retry-button" class="button">Coba lagi</button>
                 </div>
 
                 <!-- Empty State -->
@@ -80,31 +81,8 @@
     const experienceForm = document.getElementById('experience-form'); // null untuk peran selain superuser
 
     //Utilitas  
-    // Mengubah karakter khusus HTML menjadi entity agar ditampilkan sebagai teks
-    function escapeHtml(value) {
-        return String(value ?? '')
-            .replaceAll('&', '&amp;')
-            .replaceAll('<', '&lt;')
-            .replaceAll('>', '&gt;')
-            .replaceAll('"', '&quot;')
-            .replaceAll("'", '&#39;');
-    }
+    // escapeHtml() dan getCookie() dimuat dari static/js/utils.js (lewat base.html)
 
-    // Membaca nilai cookie, digunakan untuk mengambil token CSRF
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
 
     function closeExperienceModal() {
         const modal = document.getElementById('add-experience-modal');
@@ -272,6 +250,11 @@
     if (experienceForm) {
         experienceForm.addEventListener('submit', addExperience);
     }
+
+    // Tombol "Coba lagi" pada state error
+    document.getElementById('retry-button').addEventListener('click', function () {
+        fetchExperiences(searchInput.value.trim());
+    });
 
     // Start  
     fetchExperiences(searchInput.value.trim());

@@ -3,8 +3,7 @@ from main.forms import ProjectForm, ExperienceForm
 from main.models import Experience, Project
 
 from django.contrib import messages
-from django.core import serializers
-from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
+from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts   import get_object_or_404, redirect, render
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
