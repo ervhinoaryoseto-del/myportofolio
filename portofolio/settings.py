@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+from django.core.exceptions import ImproperlyConfigured
 
 load_dotenv()
 
@@ -23,17 +24,21 @@ PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-h(^0hx-4#)q@^9u2x21$kn6449mtb&fcbekt*ioiqxdbu6xbrl'
+# Dibaca dari environment variable (.env lokal / environment PWS), tidak di-hardcode.
+SECRET_KEY = os.getenv('SECRET_KEY')
+if not SECRET_KEY:
+    if PRODUCTION:
+        raise ImproperlyConfigured('SECRET_KEY wajib diisi di environment production.')
+    SECRET_KEY = 'django-insecure-dev-only-key' 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = not PRODUCTION
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "ervhino-aryo-myportofolio.pws.cs.ui.ac.id"]
 CSRF_TRUSTED_ORIGINS = ["https://ervhino-aryo-myportofolio.pws.cs.ui.ac.id"]
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
