@@ -95,6 +95,7 @@ class ExperienceForm(ModelForm):
             }),
 
             'ended_at': DateTimeInput(
+                format='%Y-%m-%dT%H:%M',
                 attrs={
                     'type': 'datetime-local'
                 }
