@@ -99,6 +99,7 @@ python manage.py test
 | **Tugas 4** | Menerapkan otorisasi pada Experience: star, peran Editor lewat Django Group dengan helper `is_editor_user()`, pembatasan di view (HTTP 403), dan tombol aksi yang disesuaikan dengan peran. |
 | **Tutorial 5** | Mengubah halaman Projects menjadi AJAX: endpoint JSON dengan info star, pencarian dengan debouncing, modal tambah proyek dengan Fetch API, toast, dan perlindungan XSS. |
 | **Tugas 5** | Menerapkan seluruh pola Tutorial 5 pada Experience: halaman hanya kerangka dan data dimuat lewat `fetch()`, JSON dirakit manual dengan info star, state loading/kosong/error, pencarian dengan debounce 300 ms, modal tambah data, view `create_experience_ajax` (201/400/403), toast, `escapeHtml`, dan `strip_tags`. Helper `escapeHtml` dan `getCookie` dipindah ke `static/js/utils.js`, lalu test suite disusun ulang. |
+| **Tutorial 7** | Mengimplementasikan Django REST Framework untuk membangun REST API Projects, mencakup serializer, autentikasi, permission, CRUD API, pencarian proyek, serta fitur star dan informasi pengguna yang memberikan star. |
 
 **Perbaikan setelah review (Tugas 5):** format `ended_at` pada form edit diperbaiki agar sesuai dengan `datetime-local`, badge featured dikembalikan pada render AJAX Projects, `SECRET_KEY` dan `DEBUG` dipindah ke environment variable, serta test yang gagal diperbarui.
 
