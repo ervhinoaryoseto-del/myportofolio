@@ -83,6 +83,13 @@
 
     //Utilitas  
     // escapeHtml() dan getCookie() dimuat dari static/js/utils.js (lewat base.html)
+    function apiErrorMessage(result, fallback) {
+        if (result && result.detail) return result.detail;
+        const messages = result
+            ? Object.values(result).flat().map(error => typeof error === 'string' ? error : error.message).filter(Boolean)
+            : [];
+        return messages.length ? messages.join(' ') : fallback;
+    }
 
 
     function closeExperienceModal() {
@@ -118,7 +125,7 @@
         const deleteHtml = IS_SUPERUSER
             ? `<form method="post" action="${escapeHtml(deleteUrl)}">
                 {% csrf_token %}
-                <button type="submit" class="button button-danger" onclick="return confirm('Yakin ingin menghapus experience ini?');">Hapus Experience</button>
+                <button type="submit" class="button button-danger">Hapus Experience</button>
             </form>`
             : '';
 
@@ -242,10 +249,11 @@
                 showToast('Berhasil', 'Experience baru berhasil ditambahkan!', 'success');
                 fetchExperiences(searchInput.value.trim());
             } else {
-                const errorMessages = Object.values(result)
-                    .flat()
-                    .map(error => typeof error === 'string' ? error : error.message);
-                showToast('Gagal menambahkan experience', errorMessages.join(' '), 'error');
+                showToast(
+                    'Gagal menambahkan experience',
+                    apiErrorMessage(result, `Terjadi kesalahan (status ${response.status}).`),
+                    'error'
+                );
             }
         } catch (error) {
             console.error('Error adding experience:', error);
@@ -269,14 +277,17 @@
             headers: { 'X-CSRFToken': getCookie('csrftoken'), 'Accept': 'application/json' },
         });
         if (response.ok) fetchExperiences(searchInput.value.trim());
-        else showToast('Gagal', 'Tidak dapat mengubah star experience.', 'error');
+        else {
+            const result = await response.json().catch(() => ({}));
+            showToast('Gagal mengubah star', apiErrorMessage(result, `Terjadi kesalahan (status ${response.status}).`), 'error');
+        }
     });
 
     document.addEventListener('click', async function (event) {
         const button = event.target.closest('.button-danger');
         if (!button || !button.closest('form')) return;
         event.preventDefault();
-        if (!confirm('Yakin ingin menghapus experience ini?')) return;
+        if (!window.confirm('Yakin ingin menghapus experience ini?')) return;
         const response = await fetch(button.closest('form').action, {
             method: 'DELETE',
             headers: { 'X-CSRFToken': getCookie('csrftoken'), 'Accept': 'application/json' },
@@ -284,7 +295,10 @@
         if (response.ok) {
             showToast('Berhasil', 'Experience berhasil dihapus.', 'success');
             fetchExperiences(searchInput.value.trim());
-        } else showToast('Gagal', 'Tidak dapat menghapus experience.', 'error');
+        } else {
+            const result = await response.json().catch(() => ({}));
+            showToast('Gagal menghapus experience', apiErrorMessage(result, `Terjadi kesalahan (status ${response.status}).`), 'error');
+        }
     });
 
     // Tombol "Coba lagi" pada state error
