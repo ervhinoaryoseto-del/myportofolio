@@ -70,7 +70,7 @@ class ExperienceSerializer(serializers.ModelSerializer):
         return strip_tags(value)
 
     def get_star_count(self, obj):
-            return obj.starred_by.count()
+        return obj.starred_by.count()
     
     def get_is_starred(self, obj):
         request = self.context.get("request")
