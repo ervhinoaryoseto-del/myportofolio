@@ -59,14 +59,15 @@
 
     <script>
     // Konfigurasi  
-    const EXPERIENCE_ENDPOINT = "{% url 'main:get_experiences_json' %}";
-    const CREATE_EXPERIENCE_ENDPOINT = "{% url 'main:create_experience_ajax' %}";
+    const EXPERIENCE_ENDPOINT = "/api/v1/experiences/";
+    const LEGACY_EXPERIENCE_ENDPOINT = "{% url 'main:get_experiences_json' %}";
+    const CREATE_EXPERIENCE_ENDPOINT = EXPERIENCE_ENDPOINT;
     const IS_SUPERUSER = "{{ user.is_superuser|yesno:'true,false' }}" === "true";
     const CAN_EDIT = "{{ can_edit|yesno:'true,false' }}" === "true";
     const DUMMY_UUID = '00000000-0000-0000-0000-000000000000';
-    const STAR_URL_TEMPLATE = "{% url 'main:toggle_experience_star' '00000000-0000-0000-0000-000000000000' %}";
+    const STAR_URL_TEMPLATE = "/api/v1/experiences/00000000-0000-0000-0000-000000000000/star/";
     const EDIT_URL_TEMPLATE = "{% url 'main:update_experience' '00000000-0000-0000-0000-000000000000' %}";
-    const DELETE_URL_TEMPLATE = "{% url 'main:delete_experience' '00000000-0000-0000-0000-000000000000' %}";
+    const DELETE_URL_TEMPLATE = "/api/v1/experiences/00000000-0000-0000-0000-000000000000/";
     const SEARCH_DEBOUNCE_DELAY = 300;
     let searchDebounceTimer;
     let experienceAbortController;
@@ -99,8 +100,8 @@
 
     // Render kartu  
     function buildExperienceCardElement(item) {
-        const experience = item.fields;
-        const experienceId = item.pk;
+        const experience = item;
+        const experienceId = item.id;
 
         const starUrl = STAR_URL_TEMPLATE.replace(DUMMY_UUID, experienceId);
         const editUrl = EDIT_URL_TEMPLATE.replace(DUMMY_UUID, experienceId);
@@ -127,12 +128,12 @@
             ? `Dibintangi oleh ${escapeHtml(experience.starred_by_names)}`
             : "Jadilah yang pertama memberi star";
 
-        const statusText = experience.is_ongoing ? "Sedang berlangsung" : "Selesai";
+        const statusText = experience.ended_at ? "Selesai" : "Sedang berlangsung";
 
         const articleElement = document.createElement('article');
         articleElement.className = 'experience-card';
         articleElement.innerHTML = `
-            <span class="experience-category">${escapeHtml(experience.category_display)}</span>
+            <span class="experience-category">${escapeHtml(experience.category)}</span>
             <h2>${escapeHtml(experience.title)}</h2>
             <p class="experience-description">${escapeHtml(experience.description)}</p>
             <p class="experience-status">${statusText}</p>
@@ -222,8 +223,16 @@
         try {
             const response = await fetch(CREATE_EXPERIENCE_ENDPOINT, {
                 method: 'POST',
-                headers: { 'X-CSRFToken': getCookie('csrftoken') },
-                body: new FormData(experienceForm), 
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify(Object.fromEntries(
+                    Array.from(new FormData(experienceForm).entries()).map(([key, value]) => [
+                        key, value === '' && key === 'ended_at' ? null : value,
+                    ])
+                )),
             });
             const result = await response.json().catch(() => ({}));
 
@@ -233,9 +242,9 @@
                 showToast('Berhasil', 'Experience baru berhasil ditambahkan!', 'success');
                 fetchExperiences(searchInput.value.trim());
             } else {
-                const errorMessages = result.errors
-                    ? Object.values(result.errors).flat().map(error => error.message)
-                    : [result.message || `Terjadi kesalahan (status ${response.status}).`];
+                const errorMessages = Object.values(result)
+                    .flat()
+                    .map(error => typeof error === 'string' ? error : error.message);
                 showToast('Gagal menambahkan experience', errorMessages.join(' '), 'error');
             }
         } catch (error) {
@@ -250,6 +259,33 @@
     if (experienceForm) {
         experienceForm.addEventListener('submit', addExperience);
     }
+
+    document.addEventListener('submit', async function (event) {
+        const form = event.target;
+        if (!form.matches('.star-form')) return;
+        event.preventDefault();
+        const response = await fetch(form.action, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCookie('csrftoken'), 'Accept': 'application/json' },
+        });
+        if (response.ok) fetchExperiences(searchInput.value.trim());
+        else showToast('Gagal', 'Tidak dapat mengubah star experience.', 'error');
+    });
+
+    document.addEventListener('click', async function (event) {
+        const button = event.target.closest('.button-danger');
+        if (!button || !button.closest('form')) return;
+        event.preventDefault();
+        if (!confirm('Yakin ingin menghapus experience ini?')) return;
+        const response = await fetch(button.closest('form').action, {
+            method: 'DELETE',
+            headers: { 'X-CSRFToken': getCookie('csrftoken'), 'Accept': 'application/json' },
+        });
+        if (response.ok) {
+            showToast('Berhasil', 'Experience berhasil dihapus.', 'success');
+            fetchExperiences(searchInput.value.trim());
+        } else showToast('Gagal', 'Tidak dapat menghapus experience.', 'error');
+    });
 
     // Tombol "Coba lagi" pada state error
     document.getElementById('retry-button').addEventListener('click', function () {
