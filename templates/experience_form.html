@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block meta %}
     <title>
         {% if experience %}
@@ -22,6 +23,7 @@
                 {% endif %}
 
                 <form method="post"
+                      id="experience-edit-form"
                       action="
                       {% if experience %}
                           {% url 'main:update_experience' experience.id %}
@@ -61,4 +63,52 @@
             </div>
         </section>
     </main>
+    {% if experience %}
+    <script src="{% static 'js/toast.js' %}"></script>
+    <script>
+        const editExperienceForm = document.getElementById('experience-edit-form');
+        const editExperienceApiEndpoint = "/api/v1/experiences/{{ experience.id }}/";
+
+        function editApiErrorMessage(result, fallback) {
+            if (result && result.detail) return result.detail;
+            const messages = result
+                ? Object.values(result).flat().map(error => typeof error === 'string' ? error : error.message).filter(Boolean)
+                : [];
+            return messages.length ? messages.join(' ') : fallback;
+        }
+
+        editExperienceForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const submitButton = editExperienceForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            const payload = Object.fromEntries(
+                Array.from(new FormData(editExperienceForm).entries()).map(([key, value]) => [
+                    key, value === '' && key === 'ended_at' ? null : value,
+                ])
+            );
+
+            try {
+                const response = await fetch(editExperienceApiEndpoint, {
+                    method: 'PATCH',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                });
+                const result = await response.json().catch(() => ({}));
+                if (response.ok) {
+                    window.location.href = "{% url 'main:show_experience' %}";
+                } else {
+                    showToast('Gagal memperbarui experience', editApiErrorMessage(result, `Terjadi kesalahan (status ${response.status}).`), 'error');
+                }
+            } catch (error) {
+                showToast('Gagal memperbarui experience', 'Tidak dapat terhubung ke server. Silakan coba lagi.', 'error');
+            } finally {
+                submitButton.disabled = false;
+            }
+        });
+    </script>
+    {% endif %}
 {% endblock content %}

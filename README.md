@@ -100,6 +100,7 @@ python manage.py test
 | **Tutorial 5** | Mengubah halaman Projects menjadi AJAX: endpoint JSON dengan info star, pencarian dengan debouncing, modal tambah proyek dengan Fetch API, toast, dan perlindungan XSS. |
 | **Tugas 5** | Menerapkan seluruh pola Tutorial 5 pada Experience: halaman hanya kerangka dan data dimuat lewat `fetch()`, JSON dirakit manual dengan info star, state loading/kosong/error, pencarian dengan debounce 300 ms, modal tambah data, view `create_experience_ajax` (201/400/403), toast, `escapeHtml`, dan `strip_tags`. Helper `escapeHtml` dan `getCookie` dipindah ke `static/js/utils.js`, lalu test suite disusun ulang. |
 | **Tutorial 7** | Mengimplementasikan Django REST Framework untuk membangun REST API Projects, mencakup serializer, autentikasi, permission, CRUD API, pencarian proyek, serta fitur star dan informasi pengguna yang memberikan star. |
+| **Tugas 6** | Menerapkan pola Django REST Framework dari Tutorial 07 ke section Experience, mencakup `ExperienceSerializer`, validasi input dengan `strip_tags`, autentikasi berbasis session, permission untuk visitor, user biasa, Editor, dan superuser, API CRUD, pencarian berdasarkan `title`, endpoint star/unstar, integrasi Fetch API tanpa reload halaman, debounce, toast, CSRF protection, HTML escaping, serta pengujian API menggunakan `APITestCase` termasuk validasi role dan CSRF
 
 **Perbaikan setelah review (Tugas 5):** format `ended_at` pada form edit diperbaiki agar sesuai dengan `datetime-local`, badge featured dikembalikan pada render AJAX Projects, `SECRET_KEY` dan `DEBUG` dipindah ke environment variable, serta test yang gagal diperbarui.
 
@@ -162,6 +163,24 @@ await digunakan untuk menunggu proses asynchronous dari fetch() selesai sebelum 
 
 XSS (Cross-Site Scripting) adalah serangan dengan memasukkan script atau HTML berbahaya ke dalam data yang kemudian ditampilkan pada halaman web. Data yang ditampilkan melalui AJAX/JavaScript lebih rentan jika kita langsung memasukkannya ke HTML, misalnya menggunakan innerHTML, karena browser dapat menganggap isi data sebagai HTML atau script. Karena itu, data yang berasal dari server perlu di-escape terlebih dahulu sebelum dimasukkan ke halaman, sehingga karakter khusus seperti < dan > tidak dianggap sebagai kode HTML yang dapat dijalankan.
 
+### Tugas 6
+
+1. Jelaskan apa yang dimaksud dengan REST dan mengapa mengembalikan JSON saja belum cukup untuk menyebut sebuah API sebagai RESTful! Jelaskan pula perbedaan `PUT` dan `PATCH` beserta contoh kapan masing-masing sebaiknya digunakan!**
+
+REST (Representational State Transfer) adalah gaya arsitektur untuk merancang Web API yang mengatur pengelolaan resource, penggunaan HTTP method, dan komunikasi antara klien dengan server. Oleh karena itu, API yang mengembalikan JSON saja belum tentu RESTful karena harus mengikuti prinsip-prinsip tersebut. Pada Individual Assignment 6, data Experience diperlakukan sebagai resource melalui endpoint /api/v1/experiences/. PUT digunakan untuk memperbarui seluruh representasi data, sedangkan PATCH digunakan untuk memperbarui sebagian field saja. Contohnya, PATCH dapat digunakan ketika hanya ingin mengubah judul dan deskripsi Experience tanpa mengirim ulang kategori atau thumbnail.
+
+2. Jelaskan peran *serializer* pada Django REST Framework! Apa keuntungannya dibandingkan merakit *dictionary* secara manual dengan `JsonResponse` seperti pada Tutorial 05?**
+
+*Serializer* pada Django REST Framework berfungsi mengubah objek model Django menjadi representasi data JSON sekaligus memvalidasi input dari klien sebelum disimpan ke database. Pada Individual Assignment 6, ExperienceSerializer digunakan untuk mengatur field Experience yang dapat diakses dan menyediakan informasi tambahan seperti star_count, is_starred, dan starred_by_names. Dibandingkan merakit dictionary secara manual menggunakan JsonResponse seperti pada Tutorial 05, serializer membuat pengelolaan data dan validasi lebih terstruktur, konsisten, dan mengurangi kode berulang. Proses validasi dilakukan melalui .is_valid() sebelum data disimpan menggunakan .save().
+
+3. Jelaskan perbedaan autentikasi dan otorisasi pada Django REST Framework! Mengapa hak akses harus diperiksa dengan *permission class* di server, bukan hanya dengan menyembunyikan tombol di *template*?**
+
+Autentikasi adalah proses mengenali identitas pengguna, sedangkan otorisasi menentukan hak akses pengguna terhadap suatu tindakan. Pada Individual Assignment 6, SessionAuthentication digunakan untuk mengenali pengguna melalui session Django, sementara IsPortfolioOwnerOrEditorOrReadOnly mengatur hak akses terhadap API Experience. Pengunjung dapat melihat data, pengguna yang login dapat memberikan star, Editor dapat memperbarui data, sedangkan superuser dapat menambah, mengubah, dan menghapus Experience. Pemeriksaan hak akses harus dilakukan melalui permission class di server karena menyembunyikan tombol pada template hanya membatasi tampilan, bukan akses langsung ke endpoint API.
+
+4. Jelaskan mengapa permintaan yang mengubah data tetap memerlukan token CSRF ketika API memakai `SessionAuthentication`! Mengapa *test* yang memakai `force_authenticate` tidak cukup untuk membuktikan bahwa perlindungan CSRF berjalan?**
+
+Ketika API menggunakan SessionAuthentication, browser mengirimkan cookie session secara otomatis sehingga request yang mengubah data tetap memerlukan token CSRF untuk mencegah serangan Cross-Site Request Forgery (CSRF). Token tersebut dikirim melalui header X-CSRFToken agar server dapat memeriksa keabsahan request. Pengujian menggunakan force_authenticate tidak cukup karena metode tersebut melewati proses autentikasi session dan pemeriksaan CSRF yang sebenarnya. Oleh karena itu, pengujian perlu menggunakan APIClient(enforce_csrf_checks=True) dan .login() untuk memastikan request tanpa token CSRF ditolak, sedangkan request dengan token yang valid dapat diproses.
+
 ---
 
 ## AI Disclosure
@@ -201,3 +220,21 @@ Log chat (Improve dari feedback penilaian): https://chatgpt.com/share/6ac3c880-f
 - Saat saya merapikan template Projects mengikuti saran AI, container `#grid` ikut terhapus sehingga daftar proyek tidak tampil. Saya mengembalikannya.
 - Review kode menemukan bahwa test suite banyak yang gagal dan ada bug pada form edit (`ended_at` terkosongkan karena format `datetime-local`), lalu keduanya saya perbaiki dan uji ulang.
 - AI sering mengusulkan lebih dari yang diminta sehingga hasilnya perlu saya sorting agar sesuai dengan cakupan tugas.
+
+
+### Tugas 6
+**Tools:** Chatgpt (GPT-5.6 Luna)
+Log chat Tugas 6: https://chatgpt.com/share/6af183db-778c-83ec-9db3-6fb81d4f66cd 
+
+**Strategi prompting:** Saya memberi file Tutorial 07 beserta instruksi Individual Assignment 6, kemudian meminta panduan implementasi secara bertahap yang disesuaikan dengan section `Experience` pada proyek portofolio saya. Saya meminta penyesuaian penamaan dari contoh `Project` pada tutorial menjadi `Experience`, termasuk serializer, API views, URL, dan pengujian. Selama implementasi, saya memberikan kode proyek dan pesan error agar solusi dapat disesuaikan dengan struktur model, field, relasi, dan permission yang sudah digunakan.
+
+**Bagian yang dibantu AI:**
+- Pembuatan dan penyesuaian `ExperienceSerializer`, API views, routing, dan validasi data berdasarkan struktur model Experience.
+- Penyusunan test untuk menguji endpoint API, validasi input, autentikasi, permission Editor, dan fitur star 
+- Review implementasi, identifikasi bug, dan penyesuaian dokumentasi dan README berdasarkan hasil pengerjaan.
+
+**Keterbatasan AI dan perbaikan manual:**
+- AI terkadang mengasumsikan struktur model dan nama field berdasarkan contoh pada Tutorial 07, sehingga kode yang dihasilkan perlu disesuaikan kembali dengan model `Experience` yang sebenarnya.
+- Implementasi permission perlu diperiksa secara manual agar konsisten dengan aturan tugas, yaitu Editor hanya dapat mengedit, sedangkan penambahan dan penghapusan data hanya dapat dilakukan oleh superuser.
+- Implementasi relasi `starred_by` dan serializer informasi star perlu disesuaikan dengan kondisi database dan migrasi yang sudah diterapkan.
+- AI terkadang memberikan implementasi tambahan di luar kebutuhan utama. Saya tetap perlu meninjau setiap saran dan memastikan implementasi akhir mengikuti scope yang diberikan di Individual Assignment 6 dan Tutorial 07.
