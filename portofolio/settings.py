@@ -46,7 +46,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
+    'rest_framework.authtoken',
     'main',
 ]
 
@@ -54,6 +56,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -80,6 +83,21 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'portofolio.wsgi.application'
+
+
+# Django REST framework authentication
+# Token authentication is used by mobile clients, while session authentication
+# remains available for browser-based pages and the browsable API.
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+}
+
+# Local development CORS settings for Flutter Web (Chrome).
+# Restrict this value in production, preferably through an environment variable.
+CORS_ALLOW_ALL_ORIGINS = True
 
 
 # Database Configuration
